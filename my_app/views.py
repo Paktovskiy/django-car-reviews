@@ -5,41 +5,31 @@ from .serializers import CountrySerializer, ManufacturerSerializer, CarSerialize
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
-class CountryViewSet(ModelViewSet):
+class BaseViewSet(ModelViewSet):
+    permitted_methods = ['GET']
+
+    def get_permissions(self):
+        if self.request.method in self.permitted_methods:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+
+class CountryViewSet(BaseViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
-
-class ManufacturerViewSet(ModelViewSet):
+class ManufacturerViewSet(BaseViewSet):
     queryset = Manufacturer.objects.all()
     serializer_class = ManufacturerSerializer
 
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
-
-class CarViewSet(ModelViewSet):
+class CarViewSet(BaseViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
-    def get_permissions(self):
-        if self.request.method in ['GET']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
-
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(BaseViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-
-    def get_permissions(self):
-        if self.request.method in ['POST', 'GET']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    permitted_methods = ['GET', 'POST']
